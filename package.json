@@ -1,0 +1,8 @@
+{
+    "dependencies": {
+      "@apidevtools/swagger-cli": "^4.0.4",
+      "js-yaml": "^4.1.0",
+      "openapi-validator": "^0.14.2"
+    }
+  }
+  

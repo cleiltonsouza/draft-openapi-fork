@@ -3,7 +3,7 @@ info:
   title: API Bank Fixed Incomes - Open Finance Brasil
   description: |
     API de informações de operações de Renda Fixa Bancária Open Finance Brasil (Fase 4). API que retorna informações de operações de investimento do tipo Renda Fixa Bancária (CDB/RDB, LCI e LCA) mantidas nas instituições transmissoras por seus clientes, incluindo dados como denominação do produto, rentabilidade, quantidade, prazos, saldos em posição do cliente e movimentações financeiras. Não possui segregação entre pessoa natural e pessoa jurídica. Requer consentimento do cliente para todos os endpoints. A exposição se dará por cada operação de renda fixa contratada pelo cliente.
-  version: 1.0.0-rc1.0
+  version: 1.0.0-rc2.0
   license:
     name: Apache 2.0
     url: 'https://www.apache.org/licenses/LICENSE-2.0'
@@ -24,9 +24,9 @@ tags:
   - name: Balances
     description: Obtém a posição da operação de Renda Fixa Bancária identificada por investmentId.
   - name: Transactions
-    description: Obtém as movimentações históricas (últimos 12 meses) da operação de Fundos de Investimento identificada por investmentId.
+    description: Obtém as movimentações históricas (últimos 12 meses) da operação de Renda Fixa Bancária identificada por investmentId.
   - name: Transactions Current
-    description: 'Obtém as movimentações recentes da operação de Fundos de Investimento identificada por investmentId. O período a ser considerado para apresentação de movimentações será de até 7 dias - 7 dias anteriores da consulta, incluindo o dia da consulta (D-6).'
+    description: 'Obtém as movimentações recentes da operação de Renda Fixa Bancária identificada por investmentId. O período a ser considerado para apresentação de movimentações será de até 7 dias - 7 dias anteriores da consulta, incluindo o dia da consulta (D-6).'
 paths:
   /investments:
     get:
@@ -74,9 +74,8 @@ paths:
         default:
           $ref: '#/components/responses/DefaultWithAdditionalProperties'
       security:
-        - OpenId:
+        - OAuth2AuthorizationCode:
             - openid
-          OAuth2Security:
             - 'consent:consentId'
             - bank-fixed-incomes
   '/investments/{investmentId}':
@@ -123,9 +122,8 @@ paths:
         default:
           $ref: '#/components/responses/DefaultWithAdditionalProperties'
       security:
-        - OpenId:
+        - OAuth2AuthorizationCode:
             - openid
-          OAuth2Security:
             - 'consent:consentId'
             - bank-fixed-incomes
   '/investments/{investmentId}/balances':
@@ -179,18 +177,17 @@ paths:
         default:
           $ref: '#/components/responses/DefaultWithAdditionalProperties'
       security:
-        - OpenId:
+        - OAuth2AuthorizationCode:
             - openid
-          OAuth2Security:
             - 'consent:consentId'
             - bank-fixed-incomes
   '/investments/{investmentId}/transactions':
     get:
       tags:
         - Transactions
-      summary: Obtém as movimentações históricas (últimos 12 meses) da operação de Fundos de Investimento identificada por investmentId.
+      summary: Obtém as movimentações históricas (últimos 12 meses) da operação de Renda Fixa Bancária identificada por investmentId.
       operationId: banktFixedIncomesGetInvestmentsInvestmentIdTransactions
-      description: Obtém as movimentações históricas (últimos 12 meses) da operação de Fundos de Investimento identificada por investmentId.
+      description: Obtém as movimentações históricas (últimos 12 meses) da operação de Renda Fixa Bancária identificada por investmentId.
       parameters:
         - $ref: '#/components/parameters/InvestmentId'
         - $ref: '#/components/parameters/Authorization'
@@ -233,18 +230,17 @@ paths:
         default:
           $ref: '#/components/responses/TransactionsDefaultWithAdditionalProperties'
       security:
-        - OpenId:
+        - OAuth2AuthorizationCode:
             - openid
-          OAuth2Security:
             - 'consent:consentId'
             - bank-fixed-incomes
   '/investments/{investmentId}/transactions-current':
     get:
       tags:
         - Transactions Current
-      summary: 'Obtém as movimentações recentes da operação de Fundos de Investimento identificada por investmentId. O período a ser considerado para apresentação de movimentações será de até 7 dias - 7 dias anteriores da consulta, incluindo o dia da consulta (D-6).'
+      summary: 'Obtém as movimentações recentes da operação de Renda Fixa Bancária identificada por investmentId. O período a ser considerado para apresentação de movimentações será de até 7 dias - 7 dias anteriores da consulta, incluindo o dia da consulta (D-6).'
       operationId: banktFixedIncomesGetInvestmentsInvestmentIdTransactionsCurrent
-      description: 'Obtém as movimentações recentes da operação de Fundos de Investimento identificada por investmentId. O período a ser considerado para apresentação de movimentações será de até 7 dias - 7 dias anteriores da consulta, incluindo o dia da consulta (D-6).'
+      description: 'Obtém as movimentações recentes da operação de Renda Fixa Bancária identificada por investmentId. O período a ser considerado para apresentação de movimentações será de até 7 dias - 7 dias anteriores da consulta, incluindo o dia da consulta (D-6).'
       parameters:
         - $ref: '#/components/parameters/InvestmentId'
         - $ref: '#/components/parameters/Authorization'
@@ -287,9 +283,8 @@ paths:
         default:
           $ref: '#/components/responses/TransactionsDefaultWithAdditionalProperties'
       security:
-        - OpenId:
+        - OAuth2AuthorizationCode:
             - openid
-          OAuth2Security:
             - 'consent:consentId'
             - bank-fixed-incomes
 components:
@@ -900,7 +895,7 @@ components:
           $ref: '#/components/schemas/EnumBankFixedIncomeMovementType'
         transactionType:
           $ref: '#/components/schemas/EnumBankFixedIncomeTransactionType'
-        typeAdditionalInfo:
+        trasanctionTypeAdditionalInfo:
           type: string
           maxLength: 100
           pattern: '[\w\W\s]*'
@@ -1075,10 +1070,7 @@ components:
       pattern: '^\d{1,15}\.\d{2,4}$'
       example: '1000.0004'
   securitySchemes:
-    OpenId:
-      type: openIdConnect
-      openIdConnectUrl: 'https://auth.mockbank.poc.raidiam.io/.well-known/openid-configuration'
-    OAuth2Security:
+    OAuth2AuthorizationCode:
       type: oauth2
       description: Fluxo OAuth necessário para que a receptora tenha acesso aos dados na instituição transmissora. Requer o processo de redirecionamento e autenticação do usuário a que se referem os dados.
       flows:
